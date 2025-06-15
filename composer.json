@@ -1,0 +1,38 @@
+{
+    "name": "recharge-meter/service",
+    "description": "Laravel package for managing electrical meter recharges",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "RechargeMeter\\RechargeMeterService\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Your Name",
+            "email": "your.email@example.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "guzzlehttp/guzzle": "^7.8"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "orchestra/testbench": "^8.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "RechargeMeter\\RechargeMeterService\\Providers\\RechargeMeterServiceProvider"
+            ],
+            "aliases": {
+                "Recharge": "RechargeMeter\\RechargeMeterService\\Facades\\Recharge"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+} 
