@@ -13,16 +13,19 @@ A Laravel package for managing electrical and water meter recharges using the ST
 - Simulation mode for testing
 - Database tracking of all operations
 
+## Author
+
+**Dr Constantine Msigwa**  
+Email: varaai@info.com
+
 ## Installation
 
-1. Add the package to your `composer.json`:
+### Via Composer
 
-```json
-{
-    "require": {
-        "recharge-meter/service": "*"
-    }
-}
+1. Install the package via Composer:
+
+```bash
+composer require recharge-meter/recharge-meter-service
 ```
 
 2. Publish the configuration:
@@ -48,6 +51,42 @@ RECHARGE_CONNECT_TIMEOUT=10
 RECHARGE_REQUEST_TIMEOUT=30
 ```
 
+### Manual Installation
+
+If you prefer to install manually, add the package to your `composer.json`:
+
+```json
+{
+    "require": {
+        "recharge-meter/recharge-meter-service": "^1.0"
+    }
+}
+```
+
+Then run:
+
+```bash
+composer install
+```
+
+## Quick Start
+
+After installation, you can start using the package immediately:
+
+```php
+use RechargeMeter\RechargeMeterService\Facades\Recharge;
+
+// Set credentials
+Recharge::setCredentials('your-user-id', 'your-password');
+
+// Process a meter recharge
+$result = Recharge::process('22000169833', 1, 5000, 0);
+
+if ($result['success']) {
+    echo "Recharge successful! Token: " . $result['data']['token'];
+}
+```
+
 ## Usage
 
 ### Authentication
@@ -55,8 +94,8 @@ RECHARGE_REQUEST_TIMEOUT=30
 All operations require authentication:
 
 ```php
-use RechargeMeter\Facades\Recharge;
-use RechargeMeter\Facades\UseType;
+use RechargeMeter\RechargeMeterService\Facades\Recharge;
+use RechargeMeter\RechargeMeterService\Facades\UseType;
 
 // Set credentials for meter operations
 Recharge::setCredentials('your-user-id', 'your-password');
@@ -159,6 +198,21 @@ All operations return a standardized response:
 ]
 ```
 
+## Configuration
+
+The package configuration file (`config/recharge.php`) contains the following settings:
+
+```php
+return [
+    'api_url' => env('RECHARGE_API_URL', 'http://120.26.4.119:9094'),
+    'simulate' => env('RECHARGE_SIMULATE', false),
+    'logging_enabled' => env('RECHARGE_LOGGING_ENABLED', true),
+    'log_channel' => env('RECHARGE_LOG_CHANNEL', 'daily'),
+    'connect_timeout' => env('RECHARGE_CONNECT_TIMEOUT', 10),
+    'request_timeout' => env('RECHARGE_REQUEST_TIMEOUT', 30),
+];
+```
+
 ## Testing
 
 The package includes a simulation mode for testing. Enable it in your `.env`:
@@ -180,6 +234,34 @@ All operations include comprehensive error handling and logging. Errors are:
 - Stored in the database for recharge operations
 - Returned in a standardized format
 
+## Examples
+
+Check the `examples/` directory for complete usage examples:
+- `basic-usage.php` - Simple recharge example
+- `usage-example.php` - Comprehensive examples
+
+## Requirements
+
+- PHP >= 8.2
+- Laravel >= 10.0
+- GuzzleHTTP >= 7.8
+
+## Support
+
+For support, please contact:
+- **Email**: varaai@info.com
+- **Author**: Dr Constantine Msigwa
+
 ## License
 
-MIT 
+This package is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Changelog
+
+### Version 1.0.0
+- Initial release
+- Meter recharge functionality
+- Use type management
+- Comprehensive logging
+- Database tracking
+- Simulation mode for testing 
