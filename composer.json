@@ -3,7 +3,7 @@
     "description": "Laravel package for managing electrical meter recharges",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "keywords": ["laravel", "meter", "recharge", "electrical", "billing"],
     "homepage": "https://github.com/recharge-meter/recharge-meter-service",
     "support": {
