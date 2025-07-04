@@ -4,14 +4,14 @@ A Laravel package for managing electrical and water meter recharges using the ST
 
 ## Features
 
-- Meter recharge token generation
-- Clear credit/tamper token management
-- Contract information retrieval
-- Meter registration and updates
-- Use type management (tariffs and pricing)
-- Comprehensive logging
-- Simulation mode for testing
-- Database tracking of all operations
+- ✅ **Meter recharge token generation** (GetVendingToken)
+- ✅ **Clear credit/tamper token management** (GetClearCreditToken, GetClearTamperSignToken)
+- ✅ **Contract information retrieval** (GetContractInfo)
+- ✅ **Meter registration and updates** (MeterRegister, MeterUpdate)
+- ✅ **Use type management** (UseTypeList, AddUseType, UpdateUseType, DeleteUseType)
+- ✅ **Comprehensive logging**
+- ✅ **Simulation mode for testing**
+- ✅ **Database tracking of all operations**
 
 ## Author
 
@@ -79,13 +79,37 @@ use RechargeMeter\RechargeMeterService\Facades\Recharge;
 // Set credentials
 Recharge::setCredentials('your-user-id', 'your-password');
 
-// Process a meter recharge
-$result = Recharge::process('22000169833', 1, 5000, 0);
+// Get contract information
+$result = Recharge::getContractInfo('22000169833', 1);
 
 if ($result['success']) {
-    echo "Recharge successful! Token: " . $result['data']['token'];
+    echo "Contract info: " . json_encode($result['data']);
 }
 ```
+
+## API Endpoints
+
+This package supports all STS Vend System API endpoints:
+
+### Power Management Endpoints
+
+| Method | Endpoint | Description | Package Method |
+|--------|----------|-------------|----------------|
+| GET | `/api/Power/GetVendingToken` | Get recharge token | `getVendingToken()` |
+| GET | `/api/Power/GetClearCreditToken` | Get clear credit token | `getClearCreditToken()` |
+| GET | `/api/Power/GetClearTamperSignToken` | Get clear tamper sign token | `getClearTamperSignToken()` |
+| GET | `/api/Power/GetContractInfo` | Get contract information | `getContractInfo()` |
+| POST | `/api/Power/MeterRegister` | Register meter | `registerMeter()` |
+| POST | `/api/Power/MeterUpdate` | Update meter | `updateMeter()` |
+
+### Use Type Management Endpoints
+
+| Method | Endpoint | Description | Package Method |
+|--------|----------|-------------|----------------|
+| GET | `/api/UseType/UseTypeList` | Get use type list | `getList()` |
+| POST | `/api/UseType/AddUseType` | Add use type | `add()` |
+| POST | `/api/UseType/UpdateUseType` | Update use type | `update()` |
+| POST | `/api/UseType/DeleteUseType` | Delete use type | `delete()` |
 
 ## Usage
 
@@ -104,33 +128,36 @@ Recharge::setCredentials('your-user-id', 'your-password');
 UseType::setCredentials('your-user-id', 'your-password');
 ```
 
-### Meter Operations
+### Power Management Operations
 
-1. **Get Vending Token**
+#### 1. Get Vending Token (Recharge)
 ```php
 // Amount-based vending (type 0)
-$result = Recharge::process('22000169833', 1, 5000, 0);
+$result = Recharge::getVendingToken('22000169833', 1, 5000, 0);
 
 // Quantity-based vending (type 1)
-$result = Recharge::process('22000169833', 1, 100, 1);
+$result = Recharge::getVendingToken('22000169833', 1, 100, 1);
+
+// Backward compatibility (alias for getVendingToken)
+$result = Recharge::process('22000169833', 1, 5000, 0);
 ```
 
-2. **Clear Credit Token**
+#### 2. Get Clear Credit Token
 ```php
 $result = Recharge::getClearCreditToken('22000169833', 1);
 ```
 
-3. **Clear Tamper Sign Token**
+#### 3. Get Clear Tamper Sign Token
 ```php
 $result = Recharge::getClearTamperSignToken('22000169833', 1);
 ```
 
-4. **Get Contract Info**
+#### 4. Get Contract Info
 ```php
 $result = Recharge::getContractInfo('22000169833', 1);
 ```
 
-5. **Register Meter**
+#### 5. Register Meter
 ```php
 $result = Recharge::registerMeter([
     'MeterCode' => '22000169833',
@@ -138,29 +165,31 @@ $result = Recharge::registerMeter([
     'CustomerName' => 'John Doe',
     'UseTypeId' => 'RES',
     'Address' => '123 Main St',
-    'PhoneNumber' => '1234567890'
+    'PhoneNumber' => '1234567890',
+    'Fax' => '1234567891' // Optional
 ]);
 ```
 
-6. **Update Meter**
+#### 6. Update Meter
 ```php
 $result = Recharge::updateMeter([
     'MeterCode' => '22000169833',
     'MeterType' => 1,
     'CustomerName' => 'John Doe Updated',
     'Address' => '456 New St',
-    'PhoneNumber' => '0987654321'
+    'PhoneNumber' => '0987654321',
+    'UseTypeId' => 'RES' // Optional
 ]);
 ```
 
-### Use Type Management
+### Use Type Management Operations
 
-1. **List Use Types**
+#### 1. Get Use Type List
 ```php
-$useTypes = UseType::getList();
+$result = UseType::getList();
 ```
 
-2. **Add Use Type**
+#### 2. Add Use Type
 ```php
 $result = UseType::add(
     useTypeId: 'RES',
@@ -171,7 +200,7 @@ $result = UseType::add(
 );
 ```
 
-3. **Update Use Type**
+#### 3. Update Use Type
 ```php
 $result = UseType::update(
     useTypeId: 'RES',
@@ -180,7 +209,7 @@ $result = UseType::update(
 );
 ```
 
-4. **Delete Use Type**
+#### 4. Delete Use Type
 ```php
 $result = UseType::delete('RES');
 ```
@@ -197,6 +226,30 @@ All operations return a standardized response:
     'history_id' => 123 // For recharge operations
 ]
 ```
+
+## API Parameters
+
+### GetVendingToken Parameters
+- `MeterCode` (string, required): Meter code (max 13 characters)
+- `MeterType` (integer, required): 1 for Electric, 2 for Water
+- `AmountOrQuantity` (float, required): Recharge amount or quantity
+- `VendingType` (integer, required): 0 for amount-based, 1 for quantity-based
+
+### MeterRegister Parameters
+- `MeterCode` (string, required): Meter code(s) - supports up to 20 codes separated by commas
+- `MeterType` (integer, required): 1 for Electric, 2 for Water
+- `CustomerName` (string, required, max 20 chars): Customer name
+- `UseTypeId` (string, required): Use type ID
+- `Address` (string, optional, max 50 chars): Customer address
+- `PhoneNumber` (string, optional, max 20 chars): Phone number
+- `Fax` (string, optional, max 20 chars): Fax number
+
+### AddUseType Parameters
+- `UseTypeId` (string, required, max 10 chars): Use type ID
+- `UseTypeName` (string, required, max 20 chars): Use type name
+- `MeterType` (integer, required): 1 for Electric, 2 for Water
+- `Price` (float, required): Unit price (0 to 1,000,000,000,000,000)
+- `Vat` (float, required): Tariff (0 to 1,000,000,000,000,000)
 
 ## Configuration
 
@@ -238,7 +291,8 @@ All operations include comprehensive error handling and logging. Errors are:
 
 Check the `examples/` directory for complete usage examples:
 - `basic-usage.php` - Simple recharge example
-- `usage-example.php` - Comprehensive examples
+- `api-usage-example.php` - Comprehensive API examples
+- `test-contract-info.php` - Testing script
 
 ## Requirements
 
@@ -257,6 +311,13 @@ For support, please contact:
 This package is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 ## Changelog
+
+### Version 1.0.1
+- Added all STS Vend System API endpoints
+- Updated method names to match OpenAPI specification
+- Added comprehensive API documentation
+- Improved error handling and logging
+- Added backward compatibility for existing methods
 
 ### Version 1.0.0
 - Initial release

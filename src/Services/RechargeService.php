@@ -24,17 +24,21 @@ class RechargeService
         return $this;
     }
 
-    public function process(string $meterCode, int $meterType, float $amount, int $vendingType = 0): array
+    /**
+     * Get vending token (recharge token)
+     * API: GET /api/Power/GetVendingToken
+     */
+    public function getVendingToken(string $meterCode, int $meterType, float $amountOrQuantity, int $vendingType = 0): array
     {
         try {
             // Call the vending API
-            $response = $this->client->getVendingToken($meterCode, $meterType, $amount, $vendingType);
+            $response = $this->client->getVendingToken($meterCode, $meterType, $amountOrQuantity, $vendingType);
 
             // Create recharge history record
             $history = RechargeHistory::create([
                 'meter_code' => $meterCode,
                 'meter_type' => $meterType,
-                'amount' => $amount,
+                'amount' => $amountOrQuantity,
                 'response_token' => $response['token'] ?? null,
                 'response_status' => $response['status'] ?? null,
                 'raw_response' => $response,
@@ -50,7 +54,7 @@ class RechargeService
             $history = RechargeHistory::create([
                 'meter_code' => $meterCode,
                 'meter_type' => $meterType,
-                'amount' => $amount,
+                'amount' => $amountOrQuantity,
                 'response_status' => 'error',
                 'raw_response' => [
                     'error' => $e->getMessage(),
@@ -65,6 +69,19 @@ class RechargeService
         }
     }
 
+    /**
+     * Process recharge (alias for getVendingToken for backward compatibility)
+     * API: GET /api/Power/GetVendingToken
+     */
+    public function process(string $meterCode, int $meterType, float $amount, int $vendingType = 0): array
+    {
+        return $this->getVendingToken($meterCode, $meterType, $amount, $vendingType);
+    }
+
+    /**
+     * Get clear credit token
+     * API: GET /api/Power/GetClearCreditToken
+     */
     public function getClearCreditToken(string $meterCode, int $meterType): array
     {
         try {
@@ -103,6 +120,10 @@ class RechargeService
         }
     }
 
+    /**
+     * Get clear tamper sign token
+     * API: GET /api/Power/GetClearTamperSignToken
+     */
     public function getClearTamperSignToken(string $meterCode, int $meterType): array
     {
         try {
@@ -141,6 +162,10 @@ class RechargeService
         }
     }
 
+    /**
+     * Get contract information
+     * API: GET /api/Power/GetContractInfo
+     */
     public function getContractInfo(string $meterCode, int $meterType): array
     {
         try {
@@ -156,6 +181,10 @@ class RechargeService
         }
     }
 
+    /**
+     * Register meter
+     * API: POST /api/Power/MeterRegister
+     */
     public function registerMeter(array $data): array
     {
         try {
@@ -171,6 +200,10 @@ class RechargeService
         }
     }
 
+    /**
+     * Update meter
+     * API: POST /api/Power/MeterUpdate
+     */
     public function updateMeter(array $data): array
     {
         try {

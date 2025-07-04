@@ -23,6 +23,10 @@ class UseTypeService
         return $this;
     }
 
+    /**
+     * Get use type list
+     * API: GET /api/UseType/UseTypeList
+     */
     public function getList(): array
     {
         try {
@@ -38,6 +42,10 @@ class UseTypeService
         }
     }
 
+    /**
+     * Add use type
+     * API: POST /api/UseType/AddUseType
+     */
     public function add(
         string $useTypeId,
         string $useTypeName,
@@ -66,6 +74,10 @@ class UseTypeService
         }
     }
 
+    /**
+     * Update use type
+     * API: POST /api/UseType/UpdateUseType
+     */
     public function update(
         string $useTypeId,
         float $price,
@@ -90,6 +102,10 @@ class UseTypeService
         }
     }
 
+    /**
+     * Delete use type
+     * API: POST /api/UseType/DeleteUseType
+     */
     public function delete(string $useTypeId): array
     {
         try {
